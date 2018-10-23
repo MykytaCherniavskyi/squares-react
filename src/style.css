@@ -1,0 +1,106 @@
+/*Main styles*/
+
+.squeres-folder {
+    display: flex;
+    margin: 100px;
+    flex-direction: column;
+}
+
+.squere {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    color: black;
+}
+
+.squere-minus {
+    visibility: hidden;
+    transition: all 0.2s;
+    background-color: rgba(255,0,0,1);
+    position: relative;
+}
+
+.squere-plus {
+    background-color: #faa427;
+    position: relative;
+}
+
+/*Controls wrappers*/
+
+.up, .left, .right, .bottom {
+    position: relative;
+}
+
+.up, .bottom {
+    transform: translateX(50px);
+}
+
+.up .squere {
+    left: 3px;
+    bottom: -2px;
+}
+
+.left .squere {
+    top: 3px;
+    left: -2px;
+}
+
+.wrapper {
+    display: flex;
+}
+
+.right .squere {
+    left: 2px;
+    top: 3px;
+}
+
+.bottom .squere {
+    top: 2px;
+    left: 3px;
+}
+
+/*Inner wrapper*/
+.center {
+    border: 1px solid lightsteelblue;
+    padding: 1px;
+}
+
+.row {
+    font-size: 0;
+}
+
+.row .squere {
+    margin: 1px;
+    background-color: deepskyblue;
+}
+
+/*Decorative styles for squeres*/
+.squere-minus::after,
+.squere-plus::after,
+.squere-plus::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 14px;
+    height: 3px;
+    background-color: white;
+}
+
+.squere-minus:hover {
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #d5494d;
+}
+
+.squere-plus::before {
+    width: 3px;
+    height: 14px;
+}
+
+.squere-plus:hover {
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #fac060;
+}
