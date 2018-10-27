@@ -12,12 +12,12 @@ export default class Cell extends React.Component {
             className: this.props.className
         };
 
-        this.rowAdd = this.rowAdd.bind(this);
-        this.colAdd = this.colAdd.bind(this);
+/*         this.rowAdd = this.rowAdd.bind(this);
+        this.colAdd = this.colAdd.bind(this); */
     }
 
 
-    rowAdd(e) {
+/*     rowAdd(e) {
         this.setState({
             row: ++this.state.row
         });
@@ -28,7 +28,7 @@ export default class Cell extends React.Component {
             col: ++this.state.col
         });
         this.props.colChange(e,this.state.row,this.state.col);
-    }
+    } */
 
     componentWillUnmount() {
 
@@ -36,27 +36,8 @@ export default class Cell extends React.Component {
 
     render() {
 
-        let item;
-
-        switch(this.state.id) {
-            case "del-col":
-                item = <div className={this.state.className}></div>
-                break;
-            case "del-row":
-                item = <div className={this.state.className}></div>
-                break;
-            case "add-row":
-                item = <div className={this.state.className} onClick={this.rowAdd}></div>
-                break;
-            case "add-col":
-                item = <div className={this.state.className} onClick={this.colAdd}></div>
-                break;
-            default:
-                item = <div className={this.state.className}></div>
-        }
-
         return (
-            item
+            <div className={this.state.className}></div>
         )
     }
 
