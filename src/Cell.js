@@ -9,8 +9,13 @@ export default class Cell extends React.Component {
             row: this.props.row,
             col: this.props.col,
             id: this.props.id,
+            size: this.props.size,
             className: this.props.className
         };
+        this.size = {
+            width: this.state.size + "px",
+            height: this.state.size + "px"
+        }
 
 /*         this.rowAdd = this.rowAdd.bind(this);
         this.colAdd = this.colAdd.bind(this); */
@@ -37,7 +42,7 @@ export default class Cell extends React.Component {
     render() {
 
         return (
-            <div className={this.state.className}></div>
+            <div className={this.state.className} style={this.size}></div>
         )
     }
 

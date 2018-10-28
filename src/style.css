@@ -14,7 +14,7 @@
 }
 
 .squere-minus {
-    /* visibility: hidden; */
+    visibility: hidden;
     transition: all 0.2s;
     background-color: rgba(255,0,0,1);
     position: relative;
