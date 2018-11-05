@@ -46,7 +46,7 @@ class Table extends React.Component{
         this.delRow = this.delRow.bind(this);
 
 
-        this.ref = React.createRef();
+        // this.ref = React.createRef();
         this.matrixWrapper = null;
         this.minusTop = null;
         this.minusLeft = null;
@@ -170,11 +170,12 @@ class Table extends React.Component{
     }
 
     componentDidMount() {
-        this.matrixWrapper = this.ref.current;
+        // this.matrixWrapper = this.ref.current;
+        
 
-        this.minusTop = this.matrixWrapper.querySelector('.up .squere-minus');
-        this.minusLeft = this.matrixWrapper.querySelector('.left .squere-minus');
-        this.matrix = this.matrixWrapper.querySelector('.center');
+        this.minusTop = document.querySelector('.up .squere-minus');
+        this.minusLeft = document.querySelector('.left .squere-minus');
+        this.matrix = document.querySelector('.center');
     }
 
     tableOver(e) {
