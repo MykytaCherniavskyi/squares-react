@@ -1,27 +1,12 @@
 import React from 'react';
+import classNames from 'classnames';
+import './styles/addBtn.css';
 
-export default class ButtonPlus extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            className: this.props.className,
-            size: this.props.size,
-            action: this.props.action
-        };
-
-        this.size = {
-            width: this.state.size + "px",
-            height: this.state.size + "px"
-        }
+export default function ButtonPlus(props) {
+    const size = {
+        width: props.size + "px",
+        height: props.size + "px"
     }
 
-    render() {
-
-        return (
-            <div className={this.state.className} style={this.size} onClick={this.state.action}/>
-        )
-    }
-
+    return (<div className={props.className}  style={size} onClick={props.action}/>)
 }

@@ -1,0 +1,37 @@
+.squere-minus {
+    visibility: hidden;
+    transition: all 0.2s;
+    background-color: rgba(255,0,0,1);
+    position: relative;
+}
+
+.up, .bottom {
+    transform: translateX(50px);
+}
+
+.up .squere {
+    left: 3px;
+    bottom: -2px;
+}
+
+.left .squere {
+    top: 3px;
+    left: -2px;
+}
+
+.squere-minus::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 14px;
+    height: 3px;
+    background-color: white;
+}
+
+.squere-minus:hover {
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #d5494d;
+}

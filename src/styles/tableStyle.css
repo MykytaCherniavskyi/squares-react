@@ -1,0 +1,25 @@
+/*Main styles*/
+
+.squeres-folder {
+    display: flex;
+    margin: 100px;
+    flex-direction: column;
+}
+
+.center {
+    border: 1px solid lightsteelblue;
+    padding: 1px;
+}
+
+.row {
+    display: flex;
+    font-size: 0;
+}
+
+.wrapper {
+    display: flex;
+}
+
+.up, .left, .right, .bottom {
+    position: relative;
+}

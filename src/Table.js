@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import Row from './Row';
+import './styles/tableStyle.css';
 import Cell from './Cell';
 import ButtonPlus from './ButtonPlus';
 import ButtonMinus from './ButtonMinus';
@@ -27,8 +27,6 @@ class Table extends React.Component{
             offsetLeft: 0,
             offsetTop: 0
         };
-        this.nextRow = this.state.row + 1;
-        this.nextCol = this.state.col + 1;
 
         // this.ref = React.createRef();
         this.matrixWrapper = null;
@@ -37,54 +35,34 @@ class Table extends React.Component{
         this.matrix = null;
     }
 
-    updateCol = (nextCol) => {
-        this.setState({
-            col: nextCol
-        });
-
-        this.colArr.push(nextCol);
-
-    }
-
-    updateRow = (nextRow) => {
-        this.setState({
-            row: nextRow
-        }, () => {
-            // console.log("I'm assinchronic now")
-        });
-        this.rowArr.push(nextRow);
-    }
-
-    createRow = (update) => {
-
-        if  (update == this.updateRow) {
-            update(this.nextRow);
-            
-        }
-        if  (update == this.updateCol) {
-            update(this.nextCol);
-            this.nextCol += 1;
-        }
-        
-    }
-
     rowAdd = (e) => {        
+        const nextRow = this.state.row + 1;
+
         let currentRowArr = [];
         this.state.rowArr.forEach((item) => {
             currentRowArr.push(item);
         })
-        currentRowArr.push(this.nextRow);
+        currentRowArr.push(nextRow);
 
         this.setState({
-            row: this.nextRow,
+            row: nextRow,
             rowArr: currentRowArr
-        }, () => {
-            this.nextRow += 1;
         });
     }
 
     colAdd = (e) => {
-        this.createRow(this.updateCol);
+        const nextCol = this.state.col + 1;
+
+       let currentColArr = [];
+       this.state.colArr.forEach((item) => {
+           currentColArr.push(item)
+       })
+       currentColArr.push(nextCol);
+
+       this.setState({
+           col: nextCol,
+           colArr: currentColArr
+       })
     }
 
     delRow = (e) => {
@@ -182,45 +160,45 @@ class Table extends React.Component{
 
         const target = e.target;
 
-        if (target === this.matrix
-            || target.className === 'squere'
-            || target.className === 'row'
-            || target.className === 'squere squere-minus') {
+        // if (target === this.matrix
+        //     || target.className === 'squere'
+        //     || target.className === 'row'
+        //     || target.className === 'squere squere-minus') {
 
-                const rowsCount = this.rowArr.length;
-                const cellCount = this.colArr.length;
+        //         const rowsCount = this.rowArr.length;
+        //         const cellCount = this.colArr.length;
 
-                if  (rowsCount > 1) this.minusLeft.style.visibility = 'visible';
-                else this.minusLeft.style.visibility = 'hidden';
-                if  (cellCount > 1) this.minusTop.style.visibility = 'visible';
-                else this.minusTop.style.visibility = 'hidden';
+        //         if  (rowsCount > 1) this.minusLeft.style.visibility = 'visible';
+        //         else this.minusLeft.style.visibility = 'hidden';
+        //         if  (cellCount > 1) this.minusTop.style.visibility = 'visible';
+        //         else this.minusTop.style.visibility = 'hidden';
 
-                this.offsets.offsetLeft = target.getBoundingClientRect().top - this.matrix.getBoundingClientRect().top;
-                this.offsets.offsetTop = target.getBoundingClientRect().left - this.matrix.getBoundingClientRect().left;
+        //         this.offsets.offsetLeft = target.getBoundingClientRect().top - this.matrix.getBoundingClientRect().top;
+        //         this.offsets.offsetTop = target.getBoundingClientRect().left - this.matrix.getBoundingClientRect().left;
 
-                const allSquares = this.matrix.getElementsByClassName('squere');
-                const inCenterSquares = Array.prototype.filter.call(allSquares, (allSquares) => {
-                    return allSquares.className === 'squere';
-                });
+        //         const allSquares = this.matrix.getElementsByClassName('squere');
+        //         const inCenterSquares = Array.prototype.filter.call(allSquares, (allSquares) => {
+        //             return allSquares.className === 'squere';
+        //         });
 
-                if  (inCenterSquares.includes(target)) {
+        //         if  (inCenterSquares.includes(target)) {
 
-                    const currentRow = target.parentElement;
-                    const currentInnerDiv = target;
+        //             const currentRow = target.parentElement;
+        //             const currentInnerDiv = target;
 
-                    this.positions.row = Array.from(this.matrix.children).indexOf(currentRow);
-                    this.positions.col = Array.from(currentRow.children).indexOf(currentInnerDiv);
+        //             this.positions.row = Array.from(this.matrix.children).indexOf(currentRow);
+        //             this.positions.col = Array.from(currentRow.children).indexOf(currentInnerDiv);
 
-                    this.minusTop.style.left = this.offsets.offsetTop + 'px';
-                    this.minusLeft.style.top = this.offsets.offsetLeft + 'px';
+        //             this.minusTop.style.left = this.offsets.offsetTop + 'px';
+        //             this.minusLeft.style.top = this.offsets.offsetLeft + 'px';
 
-                }
+        //         }
 
 
-            } else {
-                this.minusLeft.style.visibility = 'hidden';
-                this.minusTop.style.visibility = 'hidden';
-            }
+        //     } else {
+        //         this.minusLeft.style.visibility = 'hidden';
+        //         this.minusTop.style.visibility = 'hidden';
+        //     }
 
     }
 

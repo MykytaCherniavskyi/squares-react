@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './style.css'
+// import './style.css'
 import Table from './Table';
 
 ReactDOM.render(<Table
