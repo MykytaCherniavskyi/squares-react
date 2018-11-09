@@ -13,6 +13,10 @@
     color: black;
 }
 
+.row {
+    display: flex;
+}
+
 .squere-minus {
     visibility: hidden;
     transition: all 0.2s;

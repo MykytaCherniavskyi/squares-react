@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classNames from 'classnames';
 import Row from './Row';
 import Cell from './Cell';
 import ButtonPlus from './ButtonPlus';
@@ -12,8 +13,11 @@ class Table extends React.Component{
         this.state = {
             col: this.props.initialWidth,
             row: this.props.initialHeight,
-            size: this.props.cellSize
+            size: this.props.cellSize,
+            rowArr: [],
+            colArr: []
         };
+
         
         this.positions = {
             col: 0,
@@ -25,26 +29,6 @@ class Table extends React.Component{
         };
         this.nextRow = this.state.row + 1;
         this.nextCol = this.state.col + 1;
-        this.rowArr = [];
-        this.colArr = [];
-
-
-        for (let i = 1; i <= this.state.row; i++) {
-            this.rowArr.push(i);
-        }
-        for (let i = 1; i <= this.state.col; i++) {
-            this.colArr.push(i);
-        }
-
-        this.updateCol = this.updateCol.bind(this);
-        this.updateRow = this.updateRow.bind(this);
-        this.tableOver = this.tableOver.bind(this);
-        this.tableOut = this.tableOut.bind(this);
-        this.rowAdd = this.rowAdd.bind(this);
-        this.colAdd = this.colAdd.bind(this);
-        this.delCol = this.delCol.bind(this);
-        this.delRow = this.delRow.bind(this);
-
 
         // this.ref = React.createRef();
         this.matrixWrapper = null;
@@ -53,7 +37,7 @@ class Table extends React.Component{
         this.matrix = null;
     }
 
-    updateCol(nextCol) {
+    updateCol = (nextCol) => {
         this.setState({
             col: nextCol
         });
@@ -62,47 +46,48 @@ class Table extends React.Component{
 
     }
 
-    updateRow(nextRow) {
+    updateRow = (nextRow) => {
         this.setState({
             row: nextRow
+        }, () => {
+            // console.log("I'm assinchronic now")
         });
-
         this.rowArr.push(nextRow);
     }
 
-    createRow(update) {
+    createRow = (update) => {
 
         if  (update == this.updateRow) {
             update(this.nextRow);
-            this.nextRow += 1;
+            
         }
         if  (update == this.updateCol) {
             update(this.nextCol);
             this.nextCol += 1;
         }
         
-
-        //Генерация матрицы
-        const renderItems =  this.rowArr.map((valueRow) => 
-            <div key={valueRow} className="row">
-                {this.colArr.map((valueCol) => 
-                    <Cell 
-                    key={valueCol} 
-                    row={valueRow} 
-                    col={valueCol} 
-                    size = {this.state.size} 
-                    className="squere" />
-                )}
-            </div>
-        );
-
-        return (
-            renderItems
-        )
-
     }
 
-    delRow(e) {
+    rowAdd = (e) => {        
+        let currentRowArr = [];
+        this.state.rowArr.forEach((item) => {
+            currentRowArr.push(item);
+        })
+        currentRowArr.push(this.nextRow);
+
+        this.setState({
+            row: this.nextRow,
+            rowArr: currentRowArr
+        }, () => {
+            this.nextRow += 1;
+        });
+    }
+
+    colAdd = (e) => {
+        this.createRow(this.updateCol);
+    }
+
+    delRow = (e) => {
 
         this.minusLeft.style.visibility = 'hidden';
         this.minusTop.style.visibility = 'hidden';
@@ -135,7 +120,7 @@ class Table extends React.Component{
 
     }
 
-    delCol(e) {
+    delCol = (e) => {
 
         this.minusLeft.style.visibility = 'hidden';
         this.minusTop.style.visibility = 'hidden';
@@ -171,6 +156,21 @@ class Table extends React.Component{
 
     componentDidMount() {
         // this.matrixWrapper = this.ref.current;
+
+        let rowArrs = [];
+        let colArrs = [];
+
+        for (let i = 1; i <= this.state.row; i++) {
+            rowArrs.push(i);
+        }
+        for (let i = 1; i <= this.state.col; i++) {
+            colArrs.push(i);
+        }
+
+        this.setState({
+            rowArr: rowArrs,
+            colArr: colArrs
+        })
         
 
         this.minusTop = document.querySelector('.up .squere-minus');
@@ -178,7 +178,7 @@ class Table extends React.Component{
         this.matrix = document.querySelector('.center');
     }
 
-    tableOver(e) {
+    tableOver = (e) => {
 
         const target = e.target;
 
@@ -224,7 +224,7 @@ class Table extends React.Component{
 
     }
 
-    tableOut(e) {
+    tableOut = (e) => {
 
         const target = e.target;
         
@@ -239,15 +239,6 @@ class Table extends React.Component{
         }
 
     }
-
-    rowAdd(e) {        
-        this.createRow(this.updateRow);
-    }
-
-    colAdd(e) {
-        this.createRow(this.updateCol);
-    }
-
 
 
     render () {
@@ -267,7 +258,20 @@ class Table extends React.Component{
                         size = {this.state.size} />
                     </div>
                     <div className="center" >
-                        {this.createRow()}
+                        {
+                            //Генерация матрицы
+                            this.state.rowArr.map((valueRow) => 
+                                <div key={valueRow} className="row">
+                                    {this.state.colArr.map((valueCol) => 
+                                        <Cell 
+                                        key={valueCol} 
+                                        size = {this.state.size} 
+                                        className="squere" 
+                                        />
+                                    )}
+                                </div>
+                            )
+                        }
                     </div>
                     <div className="right">
                         <ButtonPlus className="squere squere-plus" 
