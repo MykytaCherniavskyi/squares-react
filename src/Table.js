@@ -160,6 +160,16 @@ class Table extends React.Component{
 
         const target = e.target;
 
+
+
+        if ( target.className === 'squere'
+            || target.className === 'row'
+            || target.className === 'squere squere-minus') {
+
+                // console.log(this.state.rowArr.indexOf(target))
+                console.dir(target)
+            }
+
         // if (target === this.matrix
         //     || target.className === 'squere'
         //     || target.className === 'row'
