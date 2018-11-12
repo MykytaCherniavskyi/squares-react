@@ -15,24 +15,21 @@ class Table extends React.Component{
             row: this.props.initialHeight,
             size: this.props.cellSize,
             rowArr: [],
-            colArr: []
+            colArr: [],
+            position: {
+                col: 0,
+                row: 0
+            },
+            visible: {
+                up: false,
+                left: false
+            },
+            offsets: {
+                offsetLeft: 3,
+                offsetTop: 3
+            }
         };
 
-        
-        this.positions = {
-            col: 0,
-            row: 0
-        };
-        this.offsets = {
-            offsetLeft: 0,
-            offsetTop: 0
-        };
-
-        // this.ref = React.createRef();
-        this.matrixWrapper = null;
-        this.minusTop = null;
-        this.minusLeft = null;
-        this.matrix = null;
     }
 
     rowAdd = (e) => {        
@@ -61,38 +58,51 @@ class Table extends React.Component{
 
        this.setState({
            col: nextCol,
-           colArr: currentColArr
+           colArr: currentColArr,
+           position: {col: NaN}
        })
     }
 
     delRow = (e) => {
 
-        this.minusLeft.style.visibility = 'hidden';
-        this.minusTop.style.visibility = 'hidden';
+        this.setState({
+            visible: {
+                up: false,
+                left: false
+            }
+        });
+
+
         setTimeout(() => {
 
             /**
              * Убрать данный фрагмент, чтобы удаление было до текущего значения this.position.row
              */
-            if (isNaN(this.positions.row) || this.rowArr.length === 1) return false;
-            //Удаляем текущий эллемент
-            this.rowArr.splice(this.positions.row, 1);
+            if (isNaN(this.state.position.row) || this.state.rowArr.length === 1) return false;
 
-            const rowArrLength = this.rowArr.length;
+            let currentRowArr = [];
+            this.state.rowArr.forEach((item) => {
+                currentRowArr.push(item)
+            })
 
-            this.rowArr = [];
+            const ePosition = this.state.position.row;
 
-            //Создаем массив нужной длинны после удаления эллемента из массива
+            currentRowArr.splice(ePosition, 1);
+
+            const rowArrLength = currentRowArr.length;
+
+            let newRowArr = []
+
             for (let i = 1; i <= rowArrLength; i++) {
-                this.rowArr.push(i);
+                newRowArr.push(i);
             }
 
-            this.nextRow = this.rowArr.length + 1;
 
-            this.positions.row = NaN;
             this.setState({
-                row: this.rowArr.length
-            }); 
+                row: currentRowArr.length,
+                rowArr: newRowArr,
+                position: {row: NaN}
+            })
 
         },200);
 
@@ -100,32 +110,46 @@ class Table extends React.Component{
 
     delCol = (e) => {
 
-        this.minusLeft.style.visibility = 'hidden';
-        this.minusTop.style.visibility = 'hidden';
+        this.setState({
+            visible: {
+                up: false,
+                left: false
+            }
+        });
+
         setTimeout(() => {
 
             /**
-             * Убрать данный фрагмент, чтобы удаление было до текущего значения this.position.col
+             * Убрать данный фрагмент, чтобы удаление было до текущего значения this.position.row
              */
-            if (isNaN(this.positions.col) || this.colArr.length === 1) return false;
-            //Удаляем текущий эллемент
-            this.colArr.splice(this.positions.col, 1);
+            if (isNaN(this.state.position.col) || this.state.colArr.length === 1) return false;
 
-            const colArrLength = this.colArr.length;
+            let currentColArr = [];
+            this.state.colArr.forEach((item) => {
+                currentColArr.push(item)
+            })
 
-            this.colArr = [];
+            const ePosition = this.state.position.col;
 
-            //Создаем массив нужной длинны после удаления эллемента из массива
+            currentColArr.splice(ePosition, 1);
+
+            const colArrLength = currentColArr.length;
+
+            let newColArr = []
+
             for (let i = 1; i <= colArrLength; i++) {
-                this.colArr.push(i);
+                newColArr.push(i);
             }
 
-            this.nextCol = this.colArr.length + 1;
-
-            this.positions.col = NaN;
             this.setState({
-                col: this.colArr.length
-            }); 
+                col: currentColArr.length,
+                colArr: newColArr,
+                position: {col: NaN},
+                visible: {
+                    up: false,
+                    left: false
+                }
+            })
 
         },200);
 
@@ -133,7 +157,6 @@ class Table extends React.Component{
     }
 
     componentDidMount() {
-        // this.matrixWrapper = this.ref.current;
 
         let rowArrs = [];
         let colArrs = [];
@@ -149,66 +172,51 @@ class Table extends React.Component{
             rowArr: rowArrs,
             colArr: colArrs
         })
-        
-
-        this.minusTop = document.querySelector('.up .squere-minus');
-        this.minusLeft = document.querySelector('.left .squere-minus');
-        this.matrix = document.querySelector('.center');
+    
     }
 
     tableOver = (e) => {
 
         const target = e.target;
 
-
-
         if ( target.className === 'squere'
             || target.className === 'row'
             || target.className === 'squere squere-minus') {
 
-                // console.log(this.state.rowArr.indexOf(target))
-                console.dir(target)
+                const allSquares = document.getElementsByClassName('squere');
+                const inCenterSquares = Array.prototype.filter.call(allSquares, (allSquares) => {
+                    return allSquares.className === 'squere';
+                });
+
+
+
+                if  (inCenterSquares.includes(target)) {
+
+                    const currentRow = target.parentElement;
+                    const currentInnerDiv = target;
+                    const matrix = currentRow.parentElement;
+
+                    const currentRowNumber = Array.from(matrix.children).indexOf(currentRow);
+                    const currentColNumber = Array.from(currentRow.children).indexOf(currentInnerDiv);
+
+
+                    this.setState({
+                        position: {
+                            row: currentRowNumber,
+                            col: currentColNumber
+                        },
+                        visible: {
+                            up: true,
+                            left: true
+                        },
+                        offsets: {
+                            offsetLeft: 3 + currentColNumber * 52,
+                            offsetTop: 3 + currentRowNumber * 52,
+                        }
+                    })
+
+                }
             }
-
-        // if (target === this.matrix
-        //     || target.className === 'squere'
-        //     || target.className === 'row'
-        //     || target.className === 'squere squere-minus') {
-
-        //         const rowsCount = this.rowArr.length;
-        //         const cellCount = this.colArr.length;
-
-        //         if  (rowsCount > 1) this.minusLeft.style.visibility = 'visible';
-        //         else this.minusLeft.style.visibility = 'hidden';
-        //         if  (cellCount > 1) this.minusTop.style.visibility = 'visible';
-        //         else this.minusTop.style.visibility = 'hidden';
-
-        //         this.offsets.offsetLeft = target.getBoundingClientRect().top - this.matrix.getBoundingClientRect().top;
-        //         this.offsets.offsetTop = target.getBoundingClientRect().left - this.matrix.getBoundingClientRect().left;
-
-        //         const allSquares = this.matrix.getElementsByClassName('squere');
-        //         const inCenterSquares = Array.prototype.filter.call(allSquares, (allSquares) => {
-        //             return allSquares.className === 'squere';
-        //         });
-
-        //         if  (inCenterSquares.includes(target)) {
-
-        //             const currentRow = target.parentElement;
-        //             const currentInnerDiv = target;
-
-        //             this.positions.row = Array.from(this.matrix.children).indexOf(currentRow);
-        //             this.positions.col = Array.from(currentRow.children).indexOf(currentInnerDiv);
-
-        //             this.minusTop.style.left = this.offsets.offsetTop + 'px';
-        //             this.minusLeft.style.top = this.offsets.offsetLeft + 'px';
-
-        //         }
-
-
-        //     } else {
-        //         this.minusLeft.style.visibility = 'hidden';
-        //         this.minusTop.style.visibility = 'hidden';
-        //     }
 
     }
 
@@ -217,33 +225,51 @@ class Table extends React.Component{
         const target = e.target;
         
 
-        if (!(target === this.matrix
+        if (!(target.className === 'squere-minus'
             || target.className === 'squere'
-            || target.className === 'row')) {
+            || target.className === 'row'
+            || target.className === 'left'
+            || target.className === 'up'
+            || target.className === 'center')) {
             
-            this.minusLeft.style.visibility = 'hidden';
-            this.minusTop.style.visibility = 'hidden';
+                console.log(target)
+
+            this.setState({
+                visible: {
+                    up: false,
+                    left: false
+                }
+            })
 
         }
+
 
     }
 
 
     render () {
+        let hiddenUp = classNames({
+            'squere-minus_visible': this.state.visible.up
+        })
+        let hiddenLeft = classNames({
+            'squere-minus_visible': this.state.visible.left
+        })
 
 
         return (
             <div ref={this.ref} onMouseOver={this.tableOver} onMouseOut={this.tableOut} className="squeres-folder">
                 <div className="up">
-                    <ButtonMinus className="squere squere-minus"
+                    <ButtonMinus className={`squere squere-minus ${hiddenUp}`}
                     action = {this.delCol}
-                    size = {this.state.size} />
+                    size = {this.state.size}
+                    positionLeft = {this.state.offsets.offsetLeft} />
                 </div>
                 <div className="wrapper">
                     <div className="left">
-                        <ButtonMinus className="squere squere-minus"
+                        <ButtonMinus className={`squere squere-minus ${hiddenLeft}`}
                         action = {this.delRow}
-                        size = {this.state.size} />
+                        size = {this.state.size}
+                        positionTop = {this.state.offsets.offsetTop} />
                     </div>
                     <div className="center" >
                         {

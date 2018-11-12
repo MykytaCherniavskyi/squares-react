@@ -5,13 +5,17 @@
     position: relative;
 }
 
+.squere-minus_visible {
+    visibility: visible;
+}
+
 .up, .bottom {
     transform: translateX(50px);
 }
 
 .up .squere {
     left: 3px;
-    bottom: -2px;
+    bottom: 2px;
 }
 
 .left .squere {
