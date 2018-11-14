@@ -188,7 +188,7 @@ class Table extends React.Component{
                     return allSquares.className === 'squere';
                 });
 
-
+                console.dir(target)
 
                 if  (inCenterSquares.includes(target)) {
 
@@ -232,8 +232,6 @@ class Table extends React.Component{
             || target.className === 'up'
             || target.className === 'center')) {
             
-                console.log(target)
-
             this.setState({
                 visible: {
                     up: false,
