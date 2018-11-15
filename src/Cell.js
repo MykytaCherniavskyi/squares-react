@@ -7,5 +7,7 @@ export default function Cell(props) {
         height: props.size + "px"
     };
 
-    return (<div className={props.className} style={size}></div>) 
+
+
+    return (<div className={props.className} data-row={props.row} data-col={props.col}  style={size}></div>) 
 }

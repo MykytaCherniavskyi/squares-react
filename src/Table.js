@@ -188,7 +188,7 @@ class Table extends React.Component{
                     return allSquares.className === 'squere';
                 });
 
-                console.dir(target)
+                console.log(target.dataset.row,target.dataset.col)
 
                 if  (inCenterSquares.includes(target)) {
 
@@ -273,10 +273,12 @@ class Table extends React.Component{
                         {
                             //Генерация матрицы
                             this.state.rowArr.map((valueRow) => 
-                                <div key={valueRow} className="row">
+                                <div key={valueRow} data-row={valueRow} className="row">
                                     {this.state.colArr.map((valueCol) => 
                                         <Cell 
-                                        key={valueCol} 
+                                        key={valueCol}
+                                        row={valueRow}
+                                        col={valueCol} 
                                         size = {this.state.size} 
                                         className="squere" 
                                         />
