@@ -1,19 +1,38 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import './styles/tableStyle.css';
 import Cell from './Cell';
 import ButtonPlus from './ButtonPlus';
 import ButtonMinus from './ButtonMinus';
 
+function grid(row,col) {
+
+    let colArrs = [];
+    const tableGrid = [];
+
+    for (let i = 0; i <= col - 1; i++) {
+        colArrs.push(i);
+    }
+
+    for (let r = 0; r <= row - 1; r++) {
+        tableGrid[r] = {row: r, cell: colArrs };
+    }
+
+
+    return tableGrid
+}
+
 class Table extends React.Component{
 
     constructor(props) {
         super(props);
+        let tableGrid = grid(this.props.initialHeight,this.props.initialWidth);
+        console.log(tableGrid)
         this.state = {
-            col: this.props.initialWidth,
-            row: this.props.initialHeight,
+            col: this.props.initialWidth - 1,
+            row: this.props.initialHeight - 1,
             size: this.props.cellSize,
+            grid: tableGrid,
             rowArr: [],
             colArr: [],
             position: {
@@ -33,38 +52,33 @@ class Table extends React.Component{
     }
 
     rowAdd = (e) => {        
-        const nextRow = this.state.row + 1;
 
-        let currentRowArr = [];
-        this.state.rowArr.forEach((item) => {
-            currentRowArr.push(item);
-        })
-        currentRowArr.push(nextRow);
+        let newGrid = this.state.grid;
+        let lastRow = newGrid[newGrid.length - 1];
+        let newRow = Object.assign({},lastRow);
+        newRow.row += 1 ;
+        newGrid.push(newRow)
 
         this.setState({
-            row: nextRow,
-            rowArr: currentRowArr
+            grid: newGrid
         });
     }
 
     colAdd = (e) => {
-        const nextCol = this.state.col + 1;
 
-       let currentColArr = [];
-       this.state.colArr.forEach((item) => {
-           currentColArr.push(item)
-       })
-       currentColArr.push(nextCol);
+        let newGrid = this.state.grid;
+        const newCell = newGrid[newGrid.length - 1].cell.length;
+        newGrid[0].cell.push(newCell)
 
-       this.setState({
-           col: nextCol,
-           colArr: currentColArr,
-           position: {col: NaN}
-       })
+        this.setState({
+            grid: newGrid
+        })
     }
 
     delRow = (e) => {
 
+        TODO: 
+        // Использовать Array.filter для удаления эллемента. Оставить все значения кроме того, который в фокусе
         this.setState({
             visible: {
                 up: false,
@@ -156,25 +170,6 @@ class Table extends React.Component{
 
     }
 
-    componentDidMount() {
-
-        let rowArrs = [];
-        let colArrs = [];
-
-        for (let i = 1; i <= this.state.row; i++) {
-            rowArrs.push(i);
-        }
-        for (let i = 1; i <= this.state.col; i++) {
-            colArrs.push(i);
-        }
-
-        this.setState({
-            rowArr: rowArrs,
-            colArr: colArrs
-        })
-    
-    }
-
     tableOver = (e) => {
 
         const target = e.target;
@@ -183,39 +178,24 @@ class Table extends React.Component{
             || target.className === 'row'
             || target.className === 'squere squere-minus') {
 
-                const allSquares = document.getElementsByClassName('squere');
-                const inCenterSquares = Array.prototype.filter.call(allSquares, (allSquares) => {
-                    return allSquares.className === 'squere';
-                });
+                const rowIndex = target.dataset.row;
+                const colIndex = target.dataset.col;
 
-                console.log(target.dataset.row,target.dataset.col)
+                this.setState({
+                    position: {
+                        row: rowIndex,
+                        col: colIndex
+                    },
+                    visible: {
+                        up: true,
+                        left: true
+                    },
+                    offsets: {
+                        offsetLeft: 3 + colIndex * 52,
+                        offsetTop: 3 + rowIndex * 52,
+                    }
+                })
 
-                if  (inCenterSquares.includes(target)) {
-
-                    const currentRow = target.parentElement;
-                    const currentInnerDiv = target;
-                    const matrix = currentRow.parentElement;
-
-                    const currentRowNumber = Array.from(matrix.children).indexOf(currentRow);
-                    const currentColNumber = Array.from(currentRow.children).indexOf(currentInnerDiv);
-
-
-                    this.setState({
-                        position: {
-                            row: currentRowNumber,
-                            col: currentColNumber
-                        },
-                        visible: {
-                            up: true,
-                            left: true
-                        },
-                        offsets: {
-                            offsetLeft: 3 + currentColNumber * 52,
-                            offsetTop: 3 + currentRowNumber * 52,
-                        }
-                    })
-
-                }
             }
 
     }
@@ -246,25 +226,18 @@ class Table extends React.Component{
 
 
     render () {
-        let hiddenUp = classNames({
-            'squere-minus_visible': this.state.visible.up
-        })
-        let hiddenLeft = classNames({
-            'squere-minus_visible': this.state.visible.left
-        })
-
 
         return (
             <div ref={this.ref} onMouseOver={this.tableOver} onMouseOut={this.tableOut} className="squeres-folder">
                 <div className="up">
-                    <ButtonMinus className={`squere squere-minus ${hiddenUp}`}
+                    <ButtonMinus className={classNames('squere','squere-minus', {'squere-minus_visible': this.state.visible.up})}
                     action = {this.delCol}
                     size = {this.state.size}
                     positionLeft = {this.state.offsets.offsetLeft} />
                 </div>
                 <div className="wrapper">
                     <div className="left">
-                        <ButtonMinus className={`squere squere-minus ${hiddenLeft}`}
+                        <ButtonMinus className={classNames('squere','squere-minus', {'squere-minus_visible': this.state.visible.left})}
                         action = {this.delRow}
                         size = {this.state.size}
                         positionTop = {this.state.offsets.offsetTop} />
@@ -272,12 +245,12 @@ class Table extends React.Component{
                     <div className="center" >
                         {
                             //Генерация матрицы
-                            this.state.rowArr.map((valueRow) => 
-                                <div key={valueRow} data-row={valueRow} className="row">
-                                    {this.state.colArr.map((valueCol) => 
+                            this.state.grid.map((valueRow) =>
+                                <div key={valueRow.row} data-row={valueRow.row} className="row">
+                                    {valueRow.cell.map((valueCol) => 
                                         <Cell 
                                         key={valueCol}
-                                        row={valueRow}
+                                        row={valueRow.row}
                                         col={valueCol} 
                                         size = {this.state.size} 
                                         className="squere" 

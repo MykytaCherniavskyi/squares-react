@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 import './styles/delBtn.css';
 
 export default function ButtonMinus(props) {
