@@ -5,19 +5,13 @@ import Cell from './Cell';
 import ButtonPlus from './ButtonPlus';
 import ButtonMinus from './ButtonMinus';
 
-function grid(row,col) {
+function createGrid(row,col) {
 
-    let colArrs = [];
     const tableGrid = [];
 
-    for (let i = 0; i <= col - 1; i++) {
-        colArrs.push(i);
-    }
-
     for (let r = 0; r <= row - 1; r++) {
-        tableGrid[r] = {row: r, cell: colArrs };
+        tableGrid[r] = {row: r, cell: Array.from({length: col}, (v,k) => k) };
     }
-
 
     return tableGrid
 }
@@ -26,7 +20,7 @@ class Table extends React.Component{
 
     constructor(props) {
         super(props);
-        let tableGrid = grid(this.props.initialHeight,this.props.initialWidth);
+        let tableGrid = createGrid(this.props.initialHeight,this.props.initialWidth);
         console.log(tableGrid)
         this.state = {
             col: this.props.initialWidth - 1,
@@ -53,95 +47,38 @@ class Table extends React.Component{
 
     rowAdd = (e) => {        
 
-        let newGrid = this.state.grid;
-        let lastRow = newGrid[newGrid.length - 1];
-        let newRow = Object.assign({},lastRow);
-        newRow.row += 1 ;
-        newGrid.push(newRow)
+        this.setState((state,props) => {
 
-        this.setState({
-            grid: newGrid
+            let updatedGrid = this.state.grid;
+            let lastRow = updatedGrid[updatedGrid.length - 1];
+            let newRow = Object.assign({},lastRow);
+            newRow.row += 1 ;
+            updatedGrid.push(newRow)
+
+            return {
+                grid: updatedGrid
+            }
         });
+
     }
 
     colAdd = (e) => {
 
-        let newGrid = this.state.grid;
-        const newCell = newGrid[newGrid.length - 1].cell.length;
-        newGrid[0].cell.push(newCell)
+        this.setState((state,props) => {
 
-        this.setState({
-            grid: newGrid
+            let updatedGrid = this.state.grid;
+            const newCell = updatedGrid[updatedGrid.length - 1].cell.length;
+            updatedGrid.forEach(item => item.cell.push(newCell));
+            
+            return {
+                grid: updatedGrid
+            }
         })
+
     }
 
     delRow = (e) => {
-
-        // Использовать Array.filter для удаления эллемента. Оставить все значения кроме того, который в фокусе
-        // this.setState({
-        //     visible: {
-        //         up: false,
-        //         left: false
-        //     }
-        // });
-
-        let upgratedGrid = this.state.grid.filter(item => {
-            if  (item.row != this.state.position.row)
-                return item 
-        })
-
-        console.log(upgratedGrid)
-
-        // for(let i = this.state.position.row; i < upgratedGrid.length; i++) {
-
-        //     upgratedGrid[i].row -= 1;
-
-        // }
-
-        console.log(upgratedGrid)
-
-        this.setState({
-            grid: upgratedGrid
-        })
-
-        setTimeout(() => {
-
-
-
-            /**
-             * Убрать данный фрагмент, чтобы удаление было до текущего значения this.position.row
-             */
-            // if (isNaN(this.state.position.row) || this.state.rowArr.length === 1) return false;
-
-            // let currentRowArr = [];
-            // this.state.rowArr.forEach((item) => {
-            //     currentRowArr.push(item)
-            // })
-
-            // const ePosition = this.state.position.row;
-
-            // currentRowArr.splice(ePosition, 1);
-
-            // const rowArrLength = currentRowArr.length;
-
-            // let newRowArr = []
-
-            // for (let i = 1; i <= rowArrLength; i++) {
-            //     newRowArr.push(i);
-            // }
-
-
-            // this.setState({
-            //     row: currentRowArr.length,
-            //     rowArr: newRowArr,
-            //     position: {row: NaN}
-            // })
-
-        },200);
-
-    }
-
-    delCol = (e) => {
+        if (this.state.grid.length <= 1) return false
 
         this.setState({
             visible: {
@@ -150,38 +87,66 @@ class Table extends React.Component{
             }
         });
 
+
         setTimeout(() => {
+    
+            this.setState((state,props) => {
 
-            /**
-             * Убрать данный фрагмент, чтобы удаление было до текущего значения this.position.row
-             */
-            if (isNaN(this.state.position.col) || this.state.colArr.length === 1) return false;
+                let updatedGrid = state.grid.filter((item) => {
+                    
+                    if  (item.row != state.position.row)
+                        return true 
+                })
+        
+                for(let i = state.position.row; i < updatedGrid.length; i++) {
+        
+                    updatedGrid[i].row -= 1;
+        
+                }
 
-            let currentColArr = [];
-            this.state.colArr.forEach((item) => {
-                currentColArr.push(item)
+                return {
+                    grid: updatedGrid
+                }
+
             })
 
-            const ePosition = this.state.position.col;
+        },200);
 
-            currentColArr.splice(ePosition, 1);
+    }
 
-            const colArrLength = currentColArr.length;
+    delCol = (e) => {
 
-            let newColArr = []
+        if (this.state.grid[0].cell.length <= 1) return false
 
-            for (let i = 1; i <= colArrLength; i++) {
-                newColArr.push(i);
+        this.setState({
+            visible: {
+                up: false,
+                left: false
             }
+        });
 
-            this.setState({
-                col: currentColArr.length,
-                colArr: newColArr,
-                position: {col: NaN},
-                visible: {
-                    up: false,
-                    left: false
+        
+
+        setTimeout(() => {
+
+            this.setState((state,props) => {
+
+                let updatedGrid = state.grid;
+
+                updatedGrid.forEach(item => {
+                    item.cell.splice(state.position.col,1);
+                    item.cell.forEach((itemCell,index) => {
+                        if (state.position.col <= index) {
+                            item.cell[index] -= 1;
+                        }
+                    })
+                });
+
+
+                return {
+                    grid: updatedGrid
                 }
+
             })
 
         },200);
@@ -199,8 +164,6 @@ class Table extends React.Component{
 
                 const rowIndex = target.dataset.row;
                 const colIndex = target.dataset.col;
-
-                console.log(rowIndex, colIndex);
 
                 this.setState({
                     position: {
