@@ -77,46 +77,65 @@ class Table extends React.Component{
 
     delRow = (e) => {
 
-        TODO: 
         // Использовать Array.filter для удаления эллемента. Оставить все значения кроме того, который в фокусе
-        this.setState({
-            visible: {
-                up: false,
-                left: false
-            }
-        });
+        // this.setState({
+        //     visible: {
+        //         up: false,
+        //         left: false
+        //     }
+        // });
 
+        let upgratedGrid = this.state.grid.filter(item => {
+            if  (item.row != this.state.position.row)
+                return item 
+        })
+
+        console.log(upgratedGrid)
+
+        // for(let i = this.state.position.row; i < upgratedGrid.length; i++) {
+
+        //     upgratedGrid[i].row -= 1;
+
+        // }
+
+        console.log(upgratedGrid)
+
+        this.setState({
+            grid: upgratedGrid
+        })
 
         setTimeout(() => {
+
+
 
             /**
              * Убрать данный фрагмент, чтобы удаление было до текущего значения this.position.row
              */
-            if (isNaN(this.state.position.row) || this.state.rowArr.length === 1) return false;
+            // if (isNaN(this.state.position.row) || this.state.rowArr.length === 1) return false;
 
-            let currentRowArr = [];
-            this.state.rowArr.forEach((item) => {
-                currentRowArr.push(item)
-            })
+            // let currentRowArr = [];
+            // this.state.rowArr.forEach((item) => {
+            //     currentRowArr.push(item)
+            // })
 
-            const ePosition = this.state.position.row;
+            // const ePosition = this.state.position.row;
 
-            currentRowArr.splice(ePosition, 1);
+            // currentRowArr.splice(ePosition, 1);
 
-            const rowArrLength = currentRowArr.length;
+            // const rowArrLength = currentRowArr.length;
 
-            let newRowArr = []
+            // let newRowArr = []
 
-            for (let i = 1; i <= rowArrLength; i++) {
-                newRowArr.push(i);
-            }
+            // for (let i = 1; i <= rowArrLength; i++) {
+            //     newRowArr.push(i);
+            // }
 
 
-            this.setState({
-                row: currentRowArr.length,
-                rowArr: newRowArr,
-                position: {row: NaN}
-            })
+            // this.setState({
+            //     row: currentRowArr.length,
+            //     rowArr: newRowArr,
+            //     position: {row: NaN}
+            // })
 
         },200);
 
@@ -180,6 +199,8 @@ class Table extends React.Component{
 
                 const rowIndex = target.dataset.row;
                 const colIndex = target.dataset.col;
+
+                console.log(rowIndex, colIndex);
 
                 this.setState({
                     position: {
