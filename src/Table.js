@@ -23,12 +23,7 @@ class Table extends React.Component{
         let tableGrid = createGrid(this.props.initialHeight,this.props.initialWidth);
         console.log(tableGrid)
         this.state = {
-            col: this.props.initialWidth - 1,
-            row: this.props.initialHeight - 1,
-            size: this.props.cellSize,
             grid: tableGrid,
-            rowArr: [],
-            colArr: [],
             position: {
                 col: 0,
                 row: 0
@@ -48,15 +43,8 @@ class Table extends React.Component{
     rowAdd = (e) => {        
 
         this.setState((state,props) => {
-
-            let updatedGrid = this.state.grid;
-            let lastRow = updatedGrid[updatedGrid.length - 1];
-            let newRow = Object.assign({},lastRow);
-            newRow.row += 1 ;
-            updatedGrid.push(newRow)
-
             return {
-                grid: updatedGrid
+                grid: [...state.grid, {row: state.grid.length, cell: [...state.grid[0].cell]}]
             }
         });
 
@@ -66,7 +54,7 @@ class Table extends React.Component{
 
         this.setState((state,props) => {
 
-            let updatedGrid = this.state.grid;
+            const {grid: updatedGrid} = state;
             const newCell = updatedGrid[updatedGrid.length - 1].cell.length;
             updatedGrid.forEach(item => item.cell.push(newCell));
             
@@ -92,17 +80,14 @@ class Table extends React.Component{
     
             this.setState((state,props) => {
 
-                let updatedGrid = state.grid.filter((item) => {
-                    
+                const updatedGrid = state.grid.filter((item) => {
                     if  (item.row != state.position.row)
                         return true 
                 })
-        
-                for(let i = state.position.row; i < updatedGrid.length; i++) {
-        
-                    updatedGrid[i].row -= 1;
-        
-                }
+
+                updatedGrid.forEach((item,index) => {
+                    if (state.position.row <= index) updatedGrid[index].row -= 1;
+                })
 
                 return {
                     grid: updatedGrid
@@ -131,18 +116,17 @@ class Table extends React.Component{
 
             this.setState((state,props) => {
 
-                let updatedGrid = state.grid;
+                const {grid: updatedGrid} = state;
 
-                updatedGrid.forEach(item => {
+                updatedGrid.forEach((item) => {
                     item.cell.splice(state.position.col,1);
-                    item.cell.forEach((itemCell,index) => {
+                    item.cell.forEach((itemCell,index) => { 
                         if (state.position.col <= index) {
                             item.cell[index] -= 1;
                         }
                     })
                 });
-
-
+                
                 return {
                     grid: updatedGrid
                 }
@@ -162,6 +146,7 @@ class Table extends React.Component{
             || target.className === 'row'
             || target.className === 'squere squere-minus') {
 
+
                 const rowIndex = target.dataset.row;
                 const colIndex = target.dataset.col;
 
@@ -171,8 +156,8 @@ class Table extends React.Component{
                         col: colIndex
                     },
                     visible: {
-                        up: true,
-                        left: true
+                        up: this.state.grid[0].cell.length === 1 ? false : true,
+                        left: this.state.grid.length === 1 ? false : true
                     },
                     offsets: {
                         offsetLeft: 3 + colIndex * 52,
@@ -214,17 +199,21 @@ class Table extends React.Component{
         return (
             <div ref={this.ref} onMouseOver={this.tableOver} onMouseOut={this.tableOut} className="squeres-folder">
                 <div className="up">
-                    <ButtonMinus className={classNames('squere','squere-minus', {'squere-minus_visible': this.state.visible.up})}
-                    action = {this.delCol}
-                    size = {this.state.size}
-                    positionLeft = {this.state.offsets.offsetLeft} />
+                    <ButtonMinus 
+                        className={classNames({'squere-minus_visible': this.state.visible.up})}
+                        action = {this.delCol}
+                        size = {this.props.cellSize}
+                        positionLeft = {this.state.offsets.offsetLeft}
+                     />
                 </div>
                 <div className="wrapper">
                     <div className="left">
-                        <ButtonMinus className={classNames('squere','squere-minus', {'squere-minus_visible': this.state.visible.left})}
-                        action = {this.delRow}
-                        size = {this.state.size}
-                        positionTop = {this.state.offsets.offsetTop} />
+                        <ButtonMinus
+                            className={classNames({'squere-minus_visible': this.state.visible.left})}
+                            action = {this.delRow}
+                            size = {this.props.cellSize}
+                            positionTop = {this.state.offsets.offsetTop} 
+                        />
                     </div>
                     <div className="center" >
                         {
@@ -236,8 +225,7 @@ class Table extends React.Component{
                                         key={valueCol}
                                         row={valueRow.row}
                                         col={valueCol} 
-                                        size = {this.state.size} 
-                                        className="squere" 
+                                        size = {this.props.cellSize} 
                                         />
                                     )}
                                 </div>
@@ -245,15 +233,17 @@ class Table extends React.Component{
                         }
                     </div>
                     <div className="right">
-                        <ButtonPlus className="squere squere-plus" 
-                        action = {this.colAdd}
-                        size = {this.state.size} />
+                        <ButtonPlus
+                            action = {this.colAdd}
+                            size = {this.props.cellSize} 
+                        />
                     </div>
                 </div>
                 <div className="bottom">
-                    <ButtonPlus className="squere squere-plus" 
-                    action = {this.rowAdd}
-                    size = {this.state.size} />
+                    <ButtonPlus
+                        action = {this.rowAdd}
+                        size = {this.props.cellSize}
+                     />
                 </div>
             </div>
         )

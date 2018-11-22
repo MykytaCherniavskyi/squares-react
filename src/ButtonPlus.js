@@ -7,5 +7,5 @@ export default function ButtonPlus(props) {
         height: props.size + "px"
     }
 
-    return (<div className={props.className}  style={size} onClick={props.action}/>)
+    return (<div className={`squere squere-plus`}  style={size} onClick={props.action}/>)
 }

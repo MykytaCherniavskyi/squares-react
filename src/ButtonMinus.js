@@ -9,5 +9,5 @@ export default function ButtonMinus(props) {
         top: props.positionTop + "px"
     }
 
-    return (<div className={props.className}  style={size} onClick={props.action}/>)
+    return (<div className={`squere squere-minus ${props.className}`}  style={size} onClick={props.action}/>)
 }

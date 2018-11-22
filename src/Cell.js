@@ -9,5 +9,5 @@ export default function Cell(props) {
 
 
 
-    return (<div className={props.className} data-row={props.row} data-col={props.col}  style={size}></div>) 
+    return (<div className={`squere`} data-row={props.row} data-col={props.col}  style={size}></div>) 
 }
