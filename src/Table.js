@@ -9,7 +9,7 @@ function createGrid(row, col) {
   const tableGrid = [];
 
   for (let r = 0; r <= row - 1; r++) {
-    tableGrid[r] = { row: r, cell: Array.from({ length: col }, (v, k) => k) };
+    tableGrid[r] = { row: r, cells: Array.from({ length: col }, (v, k) => k) };
   }
 
   return tableGrid;
@@ -37,7 +37,6 @@ class Table extends React.Component {
         offsetTop: 3
       }
     };
-    console.log(this.state, 'created');
   }
 
   rowAdd = e => {
@@ -47,7 +46,7 @@ class Table extends React.Component {
           ...state.grid,
           {
             row: state.grid[state.grid.length - 1].row + 1,
-            cell: [...state.grid[0].cell]
+            cells: [...state.grid[0].cells]
           }
         ]
       };
@@ -56,11 +55,11 @@ class Table extends React.Component {
 
   colAdd = e => {
     this.setState((state, props) => {
-      console.log(state, 'colAdd');
       const updatedGrid = [...state.grid];
-      console.log(updatedGrid, 'clone grid');
-      const newCell = updatedGrid[updatedGrid.length - 1].cell.length;
-      updatedGrid.forEach(item => item.cell.push(newCell));
+      const cellsLength = updatedGrid[updatedGrid.length - 1].cells.length - 1;
+      const newCell =
+        updatedGrid[updatedGrid.length - 1].cells[cellsLength] + 1;
+      updatedGrid.forEach(item => item.cells.push(newCell));
 
       return {
         grid: updatedGrid
@@ -92,7 +91,7 @@ class Table extends React.Component {
   };
 
   delCol = e => {
-    if (this.state.grid[0].cell.length <= 1) return false;
+    if (this.state.grid[0].cells.length <= 1) return false;
 
     this.setState({
       visible: {
@@ -106,12 +105,7 @@ class Table extends React.Component {
         const updatedGrid = [...state.grid];
 
         updatedGrid.forEach(item => {
-          item.cell.splice(state.position.col, 1);
-          item.cell.forEach((itemCell, index) => {
-            if (state.position.col <= index) {
-              item.cell[index] -= 1;
-            }
-          });
+          item.cells.splice(state.colTarget, 1);
         });
 
         return {
@@ -125,15 +119,79 @@ class Table extends React.Component {
     const target = e.target;
 
     if (
-      target.className === 'squere' ||
-      target.className === 'row' ||
+      target.className === 'bottom' ||
+      target.className === 'right' ||
+      target.className === 'up' ||
+      target.className === 'left' ||
+      target.className === 'squere squere-minus squere-minus_visible' ||
+      target.className === 'squere squere-plus' ||
       target.className === 'squere squere-minus'
     ) {
+      let visible = {
+        up: this.state.grid[0].cells.length !== 1,
+        left: this.state.grid.length !== 1
+      };
+
+      if (target.className === 'up' || target.className === 'left') {
+        if (target.firstChild.className === 'squere squere-minus') {
+          visible = {
+            up: this.state.grid[0].cells.length !== 1,
+            left: this.state.grid.length !== 1
+          };
+        } else {
+          visible = {
+            up: false,
+            left: false
+          };
+        }
+      }
+      if (target.className === 'bottom' || target.className === 'right') {
+        if (target.firstChild.className === 'squere squere-plus') {
+          visible = {
+            up: false,
+            left: false
+          };
+        }
+      }
+      if (target.className === 'squere squere-minus squere-minus_visible') {
+        visible = {
+          up: this.state.grid[0].cells.length !== 1,
+          left: this.state.grid.length !== 1
+        };
+      }
+      if (target.className === 'squere squere-plus') {
+        visible = {
+          up: false,
+          left: false
+        };
+      }
+      if (target.className === 'squere squere-minus') {
+        visible = {
+          up: this.state.grid[0].cells.length !== 1,
+          left: this.state.grid.length !== 1
+        };
+      }
+
+      this.setState({
+        visible
+      });
+    }
+
+    if (target.className === 'squere' || target.className === 'row') {
       const rowIndex = target.dataset.row;
       const colIndex = target.dataset.col;
 
-      //curent targeting row in state
+      //current targeting row in state
       const rowTarget = this.state.grid.find(item => item.row == rowIndex);
+
+      //current targeting col in state
+      let colTarget;
+      this.state.grid.forEach(item => {
+        let currentCell = item.cells.find(cellItem => cellItem == colIndex);
+        colTarget = item.cells.indexOf(currentCell);
+      });
+      let offsetLeft =
+        colTarget == -1 ? this.state.offsets.offsetLeft : 3 + colTarget * 52;
 
       this.setState({
         position: {
@@ -141,13 +199,14 @@ class Table extends React.Component {
           col: colIndex
         },
         visible: {
-          up: this.state.grid[0].cell.length === 1 ? false : true,
-          left: this.state.grid.length === 1 ? false : true
+          up: this.state.grid[0].cells.length !== 1,
+          left: this.state.grid.length !== 1
         },
         offsets: {
-          offsetLeft: 3 + colIndex * 52,
+          offsetLeft,
           offsetTop: 3 + this.state.grid.indexOf(rowTarget) * 52
-        }
+        },
+        colTarget
       });
     }
   };
@@ -155,6 +214,10 @@ class Table extends React.Component {
   tableOut = e => {
     const target = e.target;
 
+    let visible = {
+      up: this.state.grid[0].cells.length !== 1,
+      left: this.state.grid.length !== 1
+    };
     if (
       !(
         target.className === 'squere-minus' ||
@@ -165,13 +228,15 @@ class Table extends React.Component {
         target.className === 'center'
       )
     ) {
-      this.setState({
-        visible: {
-          up: false,
-          left: false
-        }
-      });
+      visible = {
+        up: false,
+        left: false
+      };
     }
+
+    this.setState({
+      visible
+    });
   };
 
   render() {
@@ -206,7 +271,7 @@ class Table extends React.Component {
             {//Генерация матрицы
             this.state.grid.map(valueRow => (
               <div key={valueRow.row} data-row={valueRow.row} className="row">
-                {valueRow.cell.map(valueCol => (
+                {valueRow.cells.map(valueCol => (
                   <Cell
                     key={valueCol}
                     row={valueRow.row}
