@@ -77,17 +77,17 @@ class Table extends React.Component {
       }
     });
 
-    setTimeout(() => {
-      this.setState((state, props) => {
-        const updatedGrid = state.grid.filter(
-          item => item.row != state.position.row
-        );
+    // setTimeout(() => {
+    this.setState((state, props) => {
+      const updatedGrid = state.grid.filter(
+        item => item.row != state.position.row
+      );
 
-        return {
-          grid: updatedGrid
-        };
-      });
-    }, 200);
+      return {
+        grid: updatedGrid
+      };
+    });
+    // }, 200);
   };
 
   delCol = e => {
@@ -100,19 +100,19 @@ class Table extends React.Component {
       }
     });
 
-    setTimeout(() => {
-      this.setState((state, props) => {
-        const updatedGrid = [...state.grid];
+    // setTimeout(() => {
+    this.setState((state, props) => {
+      const updatedGrid = [...state.grid];
 
-        updatedGrid.forEach(item => {
-          item.cells.splice(state.colTarget, 1);
-        });
-
-        return {
-          grid: updatedGrid
-        };
+      updatedGrid.forEach(item => {
+        item.cells.splice(state.colTarget, 1);
       });
-    }, 200);
+
+      return {
+        grid: updatedGrid
+      };
+    });
+    // }, 200);
   };
 
   tableOver = e => {

@@ -1,68 +1,236 @@
 import React from 'react';
-// import ReactDOM from 'react-dom';
-// import Row from './Row';
-// import Cell from './Cell';
-// import ButtonPlus from './ButtonPlus';
-// import ButtonMinus from './ButtonMinus';
 import Table from './Table';
-import {shallow} from 'enzyme';
-import renderer from 'react-test-renderer';
+import { shallow, mount } from 'enzyme';
 
+it('Render component', () => {
+  const component = <Table initialWidth={4} initialHeight={4} cellSize={50} />;
+  const tree = shallow(component);
 
+  expect(tree).toMatchSnapshot();
+});
 
-describe('Table container', () => {
-    const props = {
-        col: 4,
-        row: 4,
-        size: '50'
-    }
+describe('Render with default props', () => {
+  const propsComponent = {
+    initialWidth: 4,
+    initialHeight: 4,
+    cellSize: 50
+  };
+  let component, tree;
 
+  beforeEach(() => {
+    component = <Table initialWidth={4} initialHeight={4} cellSize={50} />;
+    tree = mount(component);
+  });
 
-    describe('Table is rendering', () => {
+  it('Render with default initialWidth', () => {
+    expect(tree.prop('initialWidth')).toEqual(propsComponent.initialWidth);
+  });
+  it('Render with default initialHeight', () => {
+    expect(tree.props().initialHeight).toEqual(propsComponent.initialHeight);
+  });
+  it('Render with default cellSize', () => {
+    expect(tree.props().cellSize).toEqual(propsComponent.cellSize);
+  });
+});
 
-        it('isRendering', () => {
-            const currentProps = {
-                ...props
-            }
+describe('Manipulation with table', () => {
+  let component, tree;
 
-            const TableContainer = shallow(<Table {...currentProps} />);
+  beforeEach(() => {
+    component = <Table initialWidth={4} initialHeight={4} cellSize={50} />;
+    tree = mount(component);
+  });
 
-            TableContainer.find('.left .squere-minus').simulate('click');
+  it('Current default table grid (row - 4, col - 4)', () => {
+    expect(tree.state().grid).toHaveLength(4);
+    expect(tree.state().grid[0].cells).toHaveLength(4);
+  });
 
-            
+  it('Add one row (row - 5, col - 4)', () => {
+    tree
+      .find('.squere.squere-plus')
+      .last()
+      .simulate('click');
 
-            // expect(TableContainer.find('.squere').style.width).toEqual('50');
+    expect(tree.state().grid).toHaveLength(5);
+  });
 
+  it('Add one column (row - 4, col - 5)', () => {
+    tree
+      .find('.squere.squere-plus')
+      .first()
+      .simulate('click');
 
-        })
+    expect(tree.state().grid[0].cells).toHaveLength(5);
+  });
 
-    })
+  it('Remove one column (row - 4, col - 3)', () => {
+    expect(tree.state().visible.up).toBeFalsy();
 
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      }
+    });
 
-})
+    expect(tree.state().visible.up).toBeTruthy();
 
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .first()
+      .simulate('click');
 
+    expect(tree.state().grid[0].cells).toHaveLength(3);
+  });
 
+  it('Remove one row (row - 3, col - 4)', () => {
+    expect(tree.state().visible.left).toBeFalsy();
 
-// test('test', () => {
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      }
+    });
 
-//     const table = renderer.create(<Table initialWidth = {4} initialHeight = {4} cellSize = '50'/>);
+    expect(tree.state().visible.left).toBeTruthy();
 
-//     console.debug(table.delRow());
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .last()
+      .simulate('click');
 
-//     console.debug(table.toTree());
+    expect(tree.state().grid).toHaveLength(3);
+  });
 
+  it('cannot be removed less than 1 row', () => {
+    expect(tree.state().visible.left).toBeFalsy();
 
-//     // let tree = table.toJSON();
-//     // expect(tree).toMatchSnapshot();
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      }
+    });
 
-//     // tree.this.delRow();
+    expect(tree.state().visible.left).toBeTruthy();
 
-//     // let tree1 = table.toJSON();
-//     // expect(tree).toMatchSnapshot();
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .last()
+      .simulate('click');
 
-//     // tree.this.delCol();
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      },
+      position: {
+        row: 1
+      }
+    });
 
-//     // let tree2 = table.toJSON();
-//     // expect(tree).toMatchSnapshot();
-// });
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .last()
+      .simulate('click');
+
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      },
+      position: {
+        row: 2
+      }
+    });
+
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .last()
+      .simulate('click');
+
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      },
+      position: {
+        row: 3
+      }
+    });
+
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .last()
+      .simulate('click');
+
+    expect(tree.state().grid).toHaveLength(1);
+  });
+
+  it('cannot be removed less than 1 col', () => {
+    expect(tree.state().visible.up).toBeFalsy();
+
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      }
+    });
+
+    expect(tree.state().visible.up).toBeTruthy();
+
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .first()
+      .simulate('click');
+
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      },
+      position: {
+        col: 1
+      }
+    });
+
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .first()
+      .simulate('click');
+
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      },
+      position: {
+        col: 2
+      }
+    });
+
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .first()
+      .simulate('click');
+
+    tree.setState({
+      visible: {
+        up: true,
+        left: true
+      },
+      position: {
+        col: 3
+      }
+    });
+
+    tree
+      .find('.squere.squere-minus.squere-minus_visible')
+      .first()
+      .simulate('click');
+
+    expect(tree.state().grid[0].cells).toHaveLength(1);
+  });
+});
