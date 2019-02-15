@@ -2,8 +2,6 @@ import React from 'react';
 import classNames from 'classnames';
 import './styles/tableStyle.css';
 import Cell from './Cell';
-import ButtonPlus from './ButtonPlus';
-import ButtonMinus from './ButtonMinus';
 
 function createGrid(row, col) {
   const tableGrid = [];
@@ -22,19 +20,22 @@ class Table extends React.Component {
       this.props.initialHeight,
       this.props.initialWidth
     );
+
+    this.offsets = {
+      offsetLeft: 3,
+      offsetTop: 3
+    };
+
+    this.hovered = {
+      col: null,
+      row: null
+    };
+
     this.state = {
       grid: tableGrid,
-      position: {
-        col: 0,
-        row: 0
-      },
       visible: {
         up: false,
         left: false
-      },
-      offsets: {
-        offsetLeft: 3,
-        offsetTop: 3
       }
     };
   }
@@ -80,8 +81,13 @@ class Table extends React.Component {
     // setTimeout(() => {
     this.setState((state, props) => {
       const updatedGrid = state.grid.filter(
-        item => item.row != state.position.row
+        item => item.row !== this.hovered.row
       );
+
+      this.hovered = {
+        col: null,
+        row: null
+      };
 
       return {
         grid: updatedGrid
@@ -103,10 +109,13 @@ class Table extends React.Component {
     // setTimeout(() => {
     this.setState((state, props) => {
       const updatedGrid = [...state.grid];
-
       updatedGrid.forEach(item => {
-        item.cells.splice(state.colTarget, 1);
+        item.cells.splice(this.hovered.col, 1);
       });
+      this.hovered = {
+        col: null,
+        row: null
+      };
 
       return {
         grid: updatedGrid
@@ -117,126 +126,88 @@ class Table extends React.Component {
 
   tableOver = e => {
     const target = e.target;
+    let visibleLeft = false;
+    let visibleTop = false;
+
+    // console.log(target);
 
     if (
-      target.className === 'bottom' ||
-      target.className === 'right' ||
-      target.className === 'up' ||
-      target.className === 'left' ||
+      target.className === 'squere' ||
+      target.className === 'row' ||
       target.className === 'squere squere-minus squere-minus_visible' ||
-      target.className === 'squere squere-plus' ||
-      target.className === 'squere squere-minus'
+      target.className === 'squere squere-minus' ||
+      target.className === 'center'
     ) {
-      let visible = {
-        up: this.state.grid[0].cells.length !== 1,
-        left: this.state.grid.length !== 1
-      };
+      if (target.className === 'squere' || target.className === 'row') {
+        const rowIndex = Number.parseInt(target.dataset.row);
+        const colIndex = Number.parseInt(target.dataset.col);
 
-      if (target.className === 'up' || target.className === 'left') {
-        if (target.firstChild.className === 'squere squere-minus') {
-          visible = {
-            up: this.state.grid[0].cells.length !== 1,
-            left: this.state.grid.length !== 1
-          };
-        } else {
-          visible = {
-            up: false,
-            left: false
-          };
-        }
-      }
-      if (target.className === 'bottom' || target.className === 'right') {
-        if (target.firstChild.className === 'squere squere-plus') {
-          visible = {
-            up: false,
-            left: false
-          };
-        }
-      }
-      if (target.className === 'squere squere-minus squere-minus_visible') {
-        visible = {
-          up: this.state.grid[0].cells.length !== 1,
-          left: this.state.grid.length !== 1
-        };
-      }
-      if (target.className === 'squere squere-plus') {
-        visible = {
-          up: false,
-          left: false
-        };
-      }
-      if (target.className === 'squere squere-minus') {
-        visible = {
-          up: this.state.grid[0].cells.length !== 1,
-          left: this.state.grid.length !== 1
-        };
-      }
+        //current targeting row in state
+        const rowTarget = this.state.grid.find(item => item.row === rowIndex);
 
-      this.setState({
-        visible
-      });
-    }
+        //current targeting col in state
+        let colTarget;
+        this.state.grid.forEach(item => {
+          let currentCell = item.cells.find(cellItem => cellItem === colIndex);
+          colTarget = item.cells.indexOf(currentCell);
+        });
+        colTarget =
+          colTarget === -1 || colTarget === null ? this.hovered.col : colTarget;
 
-    if (target.className === 'squere' || target.className === 'row') {
-      const rowIndex = target.dataset.row;
-      const colIndex = target.dataset.col;
+        let offsetLeft =
+          colTarget === -1 ? this.offsets.offsetLeft : 3 + colTarget * 52;
 
-      //current targeting row in state
-      const rowTarget = this.state.grid.find(item => item.row == rowIndex);
+        let offsetTop = 3 + this.state.grid.indexOf(rowTarget) * 52;
 
-      //current targeting col in state
-      let colTarget;
-      this.state.grid.forEach(item => {
-        let currentCell = item.cells.find(cellItem => cellItem == colIndex);
-        colTarget = item.cells.indexOf(currentCell);
-      });
-      let offsetLeft =
-        colTarget == -1 ? this.state.offsets.offsetLeft : 3 + colTarget * 52;
-
-      this.setState({
-        position: {
-          row: rowIndex,
-          col: colIndex
-        },
-        visible: {
-          up: this.state.grid[0].cells.length !== 1,
-          left: this.state.grid.length !== 1
-        },
-        offsets: {
+        this.offsets = {
           offsetLeft,
-          offsetTop: 3 + this.state.grid.indexOf(rowTarget) * 52
-        },
-        colTarget
-      });
+          offsetTop
+        };
+        this.hovered = {
+          row: rowIndex,
+          col: colTarget
+        };
+
+        visibleLeft = this.state.grid.length !== 1 && this.hovered.row != null;
+        visibleTop =
+          this.state.grid[0].cells.length !== 1 && this.hovered.col != null;
+      } else {
+        return;
+      }
+    } else {
+      this.hovered = {
+        col: null,
+        row: null
+      };
     }
+
+    // console.log(this.hovered);
+
+    this.setState({
+      visible: {
+        up: visibleTop,
+        left: visibleLeft
+      }
+    });
   };
 
   tableOut = e => {
-    const target = e.target;
-
-    let visible = {
-      up: this.state.grid[0].cells.length !== 1,
-      left: this.state.grid.length !== 1
-    };
-    if (
-      !(
-        target.className === 'squere-minus' ||
-        target.className === 'squere' ||
-        target.className === 'row' ||
-        target.className === 'left' ||
-        target.className === 'up' ||
-        target.className === 'center'
-      )
-    ) {
-      visible = {
-        up: false,
-        left: false
-      };
-    }
-
-    this.setState({
-      visible
-    });
+    // const target = e.target;
+    // let visible;
+    // if (this.hovered.col != null && this.hovered.row != null) visible = true;
+    // if (target.className === 'squere squere-minus squere-minus_visible') {
+    //   visible = false;
+    //   this.hovered = {
+    //     col: null,
+    //     row: null
+    //   };
+    // }
+    // this.setState({
+    //   visible: {
+    //     up: visible,
+    //     left: visible
+    //   }
+    // });
   };
 
   render() {
@@ -247,24 +218,24 @@ class Table extends React.Component {
         className="squeres-folder"
       >
         <div className="up">
-          <ButtonMinus
+          <Cell
             className={classNames({
               'squere-minus_visible': this.state.visible.up
             })}
             action={this.delCol}
             size={this.props.cellSize}
-            positionLeft={this.state.offsets.offsetLeft}
+            positionLeft={this.offsets.offsetLeft}
           />
         </div>
         <div className="wrapper">
           <div className="left">
-            <ButtonMinus
+            <Cell
               className={classNames({
                 'squere-minus_visible': this.state.visible.left
               })}
               action={this.delRow}
               size={this.props.cellSize}
-              positionTop={this.state.offsets.offsetTop}
+              positionTop={this.offsets.offsetTop}
             />
           </div>
           <div className="center">
@@ -273,6 +244,7 @@ class Table extends React.Component {
               <div key={valueRow.row} data-row={valueRow.row} className="row">
                 {valueRow.cells.map(valueCol => (
                   <Cell
+                    className="squere"
                     key={valueCol}
                     row={valueRow.row}
                     col={valueCol}
@@ -283,11 +255,19 @@ class Table extends React.Component {
             ))}
           </div>
           <div className="right">
-            <ButtonPlus action={this.colAdd} size={this.props.cellSize} />
+            <Cell
+              className={'squere squere-plus'}
+              action={this.colAdd}
+              size={this.props.cellSize}
+            />
           </div>
         </div>
         <div className="bottom">
-          <ButtonPlus action={this.rowAdd} size={this.props.cellSize} />
+          <Cell
+            className={'squere squere-plus'}
+            action={this.rowAdd}
+            size={this.props.cellSize}
+          />
         </div>
       </div>
     );
