@@ -73,8 +73,17 @@ describe('Manipulation with table', () => {
         left: true
       }
     });
+    tree.hovered = {
+      col: 0
+    };
 
-    expect(tree.state().visible.up).toBeTruthy();
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -94,7 +103,11 @@ describe('Manipulation with table', () => {
       }
     });
 
-    expect(tree.state().visible.left).toBeTruthy();
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -114,7 +127,11 @@ describe('Manipulation with table', () => {
       }
     });
 
-    expect(tree.state().visible.left).toBeTruthy();
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -125,11 +142,14 @@ describe('Manipulation with table', () => {
       visible: {
         up: true,
         left: true
-      },
-      position: {
-        row: 1
       }
     });
+
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -140,11 +160,14 @@ describe('Manipulation with table', () => {
       visible: {
         up: true,
         left: true
-      },
-      position: {
-        row: 2
       }
     });
+
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -155,11 +178,14 @@ describe('Manipulation with table', () => {
       visible: {
         up: true,
         left: true
-      },
-      position: {
-        row: 3
       }
     });
+
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -179,7 +205,13 @@ describe('Manipulation with table', () => {
       }
     });
 
-    expect(tree.state().visible.up).toBeTruthy();
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -190,11 +222,16 @@ describe('Manipulation with table', () => {
       visible: {
         up: true,
         left: true
-      },
-      position: {
-        col: 1
       }
     });
+
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -205,11 +242,16 @@ describe('Manipulation with table', () => {
       visible: {
         up: true,
         left: true
-      },
-      position: {
-        col: 2
       }
     });
+
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')
@@ -220,11 +262,16 @@ describe('Manipulation with table', () => {
       visible: {
         up: true,
         left: true
-      },
-      position: {
-        col: 3
       }
     });
+
+    tree
+      .find('.center')
+      .children()
+      .first()
+      .children()
+      .first()
+      .simulate('mouseover');
 
     tree
       .find('.squere.squere-minus.squere-minus_visible')

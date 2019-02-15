@@ -71,13 +71,6 @@ class Table extends React.Component {
   delRow = e => {
     if (this.state.grid.length <= 1) return false;
 
-    this.setState({
-      visible: {
-        up: false,
-        left: false
-      }
-    });
-
     // setTimeout(() => {
     this.setState((state, props) => {
       const updatedGrid = state.grid.filter(
@@ -90,21 +83,19 @@ class Table extends React.Component {
       };
 
       return {
-        grid: updatedGrid
+        grid: updatedGrid,
+        visible: {
+          up: false,
+          left: false
+        }
       };
     });
     // }, 200);
   };
 
   delCol = e => {
-    if (this.state.grid[0].cells.length <= 1) return false;
-
-    this.setState({
-      visible: {
-        up: false,
-        left: false
-      }
-    });
+    if (this.state.grid[0].cells.length <= 1 || this.hovered.col == null)
+      return false;
 
     // setTimeout(() => {
     this.setState((state, props) => {
@@ -116,9 +107,14 @@ class Table extends React.Component {
         col: null,
         row: null
       };
+      this.oldColIndex = null;
 
       return {
-        grid: updatedGrid
+        grid: updatedGrid,
+        visible: {
+          up: false,
+          left: false
+        }
       };
     });
     // }, 200);
