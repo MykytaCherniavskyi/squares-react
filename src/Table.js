@@ -20,7 +20,7 @@ class Table extends React.Component {
       this.props.initialHeight,
       this.props.initialWidth
     );
-
+    this.oldColIndex = 0;
     this.offsets = {
       offsetLeft: 3,
       offsetTop: 3
@@ -126,10 +126,8 @@ class Table extends React.Component {
 
   tableOver = e => {
     const target = e.target;
-    let visibleLeft = false;
-    let visibleTop = false;
-
-    // console.log(target);
+    let visibleLeft;
+    let visibleTop;
 
     if (
       target.className === 'squere' ||
@@ -138,50 +136,52 @@ class Table extends React.Component {
       target.className === 'squere squere-minus' ||
       target.className === 'center'
     ) {
-      if (target.className === 'squere' || target.className === 'row') {
-        const rowIndex = Number.parseInt(target.dataset.row);
-        const colIndex = Number.parseInt(target.dataset.col);
+      let rowIndex;
+      let colIndex;
 
-        //current targeting row in state
-        const rowTarget = this.state.grid.find(item => item.row === rowIndex);
+      if (typeof target.dataset.row !== 'undefined')
+        rowIndex = Number.parseInt(target.dataset.row);
+      else rowIndex = this.hovered.row;
+      if (typeof target.dataset.col !== 'undefined')
+        colIndex = Number.parseInt(target.dataset.col);
+      else colIndex = this.oldColIndex;
 
-        //current targeting col in state
-        let colTarget;
-        this.state.grid.forEach(item => {
-          let currentCell = item.cells.find(cellItem => cellItem === colIndex);
-          colTarget = item.cells.indexOf(currentCell);
-        });
-        colTarget =
-          colTarget === -1 || colTarget === null ? this.hovered.col : colTarget;
+      //current targeting row in state
+      const rowTarget = this.state.grid.find(item => item.row === rowIndex);
 
-        let offsetLeft =
-          colTarget === -1 ? this.offsets.offsetLeft : 3 + colTarget * 52;
+      //current targeting col in state
+      let colTarget;
+      this.state.grid.forEach(item => {
+        let currentCell = item.cells.find(cellItem => cellItem === colIndex);
+        colTarget = item.cells.indexOf(currentCell);
+      });
+      colTarget =
+        colTarget === -1 || colTarget === null ? this.hovered.col : colTarget;
 
-        let offsetTop = 3 + this.state.grid.indexOf(rowTarget) * 52;
+      //offsets
+      let offsetLeft =
+        colTarget === -1 ? this.offsets.offsetLeft : 3 + colTarget * 52;
 
-        this.offsets = {
-          offsetLeft,
-          offsetTop
-        };
-        this.hovered = {
-          row: rowIndex,
-          col: colTarget
-        };
+      let offsetTop = 3 + this.state.grid.indexOf(rowTarget) * 52;
+      if (offsetTop < 3) offsetTop = 3;
 
-        visibleLeft = this.state.grid.length !== 1 && this.hovered.row != null;
-        visibleTop =
-          this.state.grid[0].cells.length !== 1 && this.hovered.col != null;
-      } else {
-        return;
-      }
-    } else {
-      this.hovered = {
-        col: null,
-        row: null
+      this.oldColIndex = colIndex;
+      this.offsets = {
+        offsetLeft,
+        offsetTop
       };
-    }
+      this.hovered = {
+        row: rowIndex,
+        col: colTarget
+      };
 
-    // console.log(this.hovered);
+      visibleLeft = this.state.grid.length !== 1 && this.hovered.row != null;
+      visibleTop =
+        this.state.grid[0].cells.length !== 1 && this.hovered.col != null;
+    } else {
+      visibleLeft = false;
+      visibleTop = false;
+    }
 
     this.setState({
       visible: {
@@ -192,22 +192,23 @@ class Table extends React.Component {
   };
 
   tableOut = e => {
-    // const target = e.target;
-    // let visible;
-    // if (this.hovered.col != null && this.hovered.row != null) visible = true;
-    // if (target.className === 'squere squere-minus squere-minus_visible') {
-    //   visible = false;
-    //   this.hovered = {
-    //     col: null,
-    //     row: null
-    //   };
-    // }
-    // this.setState({
-    //   visible: {
-    //     up: visible,
-    //     left: visible
-    //   }
-    // });
+    const target = e.target;
+
+    if (
+      !(
+        target.className === 'squere squere-minus squere-minus_visible' ||
+        target.className === 'squere squere-minus' ||
+        target.className === 'squere' ||
+        target.className === 'row'
+      )
+    ) {
+      this.setState({
+        visible: {
+          up: false,
+          left: false
+        }
+      });
+    }
   };
 
   render() {
